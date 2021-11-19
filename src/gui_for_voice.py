@@ -32,7 +32,7 @@ for label_text in label_texts:
                 state=NORMAL,
                 underline=0
                 )
-    w1.pack(fill=Y)
+    w1.pack(fill=BOTH, side=BOTTOM)
 #    i = w1.invoke()
 #    print(i)
 
