@@ -12,7 +12,7 @@ def peep(text):
     return count
 
 
-root = Tk("qq", "pp", "rr")
+root = Tk(None, "pp", "rr")
 label_texts = (
     "How are you?",
     "Hello Peter Junior!",
