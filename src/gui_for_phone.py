@@ -3,11 +3,7 @@ import os
 import functools
 
 
-def add_digit_keyboard(event):
-    add_digit(event.char)
-
-
-def add_digit(msg_par):
+def add_digit(msg_par, event=None):
     msg.configure(text=(msg.cget('text') + str(msg_par)))
 
 
@@ -16,11 +12,20 @@ def remove_digit(event=None):
 
 
 master_widget = tk.Tk()
-button_panel = tk.Frame(master_widget, bg='light blue')
-button_panel.pack(expand=False, fill=tk.BOTH)
+frame = tk.Frame(master_widget, bg='light blue')
+frame.pack()
+
+
+def grid_place(digit):
+    if digit == 0:
+        return 3, 0, 2
+    else:
+        return (digit - 1) // 3, (digit - 1) % 3, 1
+
 
 for i in range(1, 10):
-    tk.Button(button_panel,
+    r, c, cs = grid_place(i)
+    tk.Button(frame,
               text=i,
               command=functools.partial(add_digit, i),
               fg="red",
@@ -28,13 +33,15 @@ for i in range(1, 10):
               width=5,
               height=3,
               relief=tk.GROOVE). \
-        grid(row=(i - 1) // 3,
-             column=(i - 1) % 3,
+        grid(row=r,
+             column=c,
+             columnspan=cs,
+             sticky=tk.E + tk.W,
              padx=5,
              pady=5)
-    master_widget.bind(str(i), add_digit_keyboard)
+    master_widget.bind(str(i), functools.partial(add_digit, i))
 
-tk.Button(button_panel,
+tk.Button(frame,
           text=0,
           command=functools.partial(add_digit, 0),
           fg="red",
@@ -46,7 +53,8 @@ tk.Button(button_panel,
          sticky=tk.E + tk.W,
          padx=5,
          pady=5)
-b = tk.Button(button_panel,
+
+b = tk.Button(frame,
               text='DEL',
               command=remove_digit,
               fg="red",
@@ -60,7 +68,7 @@ b.grid(row=3,
        pady=5)
 master_widget.bind('d', remove_digit)
 
-msg = tk.Label(button_panel,
+msg = tk.Label(frame,
                bg='light green',
                anchor=tk.W,
                font=('times', 24, 'italic'))
