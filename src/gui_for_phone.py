@@ -1,21 +1,16 @@
 import functools
 import tkinter as tk
 
-
-class Key(tk.Button):
-    def white(self):
-        self.configure(fg='white')
-
-    def red(self):
-        self.configure(fg='red')
+small_font = 'helvetica 45'
+normal_font = 'helvetica 50'
 
 
 def add_digit(digit, event=None):
     msg.configure(text=(msg.cget('text') + str(digit)))
     current_key = keys[digit]
-    for i in range(0, 1000, 100):
-        current_key.after(i, current_key.white)
-        current_key.after(i + 50, current_key.red)
+    for ms in range(0, 1000, 100):
+        current_key.after(ms, current_key.configure, {'fg': 'yellow', 'font': small_font})
+        current_key.after(ms + 50, current_key.configure, {'fg': 'red', 'font': normal_font})
 
 
 def remove_digit(event=None):
@@ -28,7 +23,7 @@ def destroy_master(event=None):
 
 master_widget = tk.Tk()
 frame = tk.Frame(master_widget, bg='light blue')
-frame.pack()
+frame.grid()
 
 
 def grid_place(digit):
@@ -42,14 +37,15 @@ keys = []
 for i in range(0, 10):
     r, c, cs = grid_place(i)
     keys.append(
-        Key(frame,
-            text=i,
-            command=functools.partial(add_digit, i),
-            fg="red",
-            bg='grey',
-            width=5,
-            height=3,
-            relief=tk.GROOVE))
+        tk.Button(frame,
+                  text=i,
+                  command=functools.partial(add_digit, i),
+                  fg="red",
+                  bg='green',
+                  font=normal_font,
+                  width=5,
+                  height=3,
+                  relief=tk.GROOVE))
     keys[i].grid(row=r,
                  column=c,
                  columnspan=cs,
@@ -61,6 +57,7 @@ for i in range(0, 10):
 tk.Button(frame,
           text='DEL',
           command=remove_digit,
+          font=normal_font,
           fg="red",
           width=5,
           height=3). \
@@ -75,7 +72,7 @@ master_widget.bind('d', remove_digit)
 msg = tk.Label(frame,
                bg='light green',
                anchor=tk.W,
-               font=('times', 24, 'italic'))
+               font=('times', 34, 'italic'))
 msg.grid(row=4,
          column=0,
          columnspan=3,
@@ -86,6 +83,7 @@ msg.grid(row=4,
 tk.Button(frame,
           text='QUIT',
           command=destroy_master,
+          font=normal_font,
           fg="red",
           width=5,
           height=3). \
