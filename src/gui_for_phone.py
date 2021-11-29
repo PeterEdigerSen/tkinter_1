@@ -72,7 +72,7 @@ master_widget.bind('d', remove_digit)
 msg = tk.Label(frame,
                bg='light green',
                anchor=tk.W,
-               font=('times', 34, 'italic'))
+               font=('times', 50, 'italic'))
 msg.grid(row=4,
          column=0,
          columnspan=3,
