@@ -1,17 +1,27 @@
-from tkinter import Button, Frame, Tk  # Python 2
+import functools
+from tkinter import Button, Tk  # Python 3
 
 
-def func(_event=None):
-    print("Hello, world")
+def func(param, event=None):
+    if event is None:
+        txt = 'Mouse'
+    else:
+        txt = 'Key ' + event.char
+    print("Hello, world " + param + ' (source: ' + txt + ')')
 
 
-root = Tk()
-root.bind('f', func)
+root1 = Tk(className='Oho 1')
+root2 = Tk(className='Oho 2')
+root1.geometry('200x200+500+500')
+root2.geometry('200x200+800+500')
 
-frame = Frame(root)
-frame.pack()
+Button(root1, text="Hello 1", command=functools.partial(func, '1')).pack()
+Button(root2, text="Hello 2", command=functools.partial(func, '2')).pack()
 
-button = Button(frame, text="Hello", command=func)
-button.pack(side='left')
+root1.bind('a', functools.partial(func, '1'))
+root2.bind('b', functools.partial(func, '2'))
+root2.bind('c', functools.partial(func, '3'))
 
-root.mainloop()
+root1.mainloop()
+
+print('finish')
