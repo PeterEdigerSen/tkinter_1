@@ -15,13 +15,13 @@ root2 = Tk(className='Oho 2')
 root1.geometry('200x200+500+500')
 root2.geometry('200x200+800+500')
 
-rose1 = PhotoImage(file='../files/rose_1.png')
-rose2 = PhotoImage(file='../files/rose_2.png')
+rose1 = PhotoImage(file='../files/rose_1_50x67.png')
+rose2 = PhotoImage(file='../files/rose_2_100x133.png')
 
-Button(root1, image=rose1, text='Label 2', compound=CENTER,
-       width=50, height=50,
-       command=functools.partial(func, '1')). \
-    pack(side=LEFT)
+b1 = Button(root1, image=rose1, text='Label 2', compound=CENTER,
+            width=50, height=50,
+            command=functools.partial(func, '1'))
+b1.pack(side=LEFT)
 Button(root1, image=rose2, text='Label 1', compound=LEFT,
        width=50, height=50,
        command=functools.partial(func, '2')). \
