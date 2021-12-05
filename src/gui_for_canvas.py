@@ -1,17 +1,15 @@
-import tkinter as tk
 import math
-import time
-
-
-def move_objects(objects, x, y):
-    for o in objects:
-        canv.move(o, x, y)
-    pass
+import tkinter as tk
 
 
 class ComposedObject:
     def __init__(self, canvas):
         self.canvas = canvas
+
+    @staticmethod
+    def move_objects(objects, x, y):
+        for o in objects:
+            canv.move(o, x, y)
 
     def move_composed_object(self, objects, nmove, xstart, ystart, xend, yend, delay_time, move_time):
         dt = move_time / nmove
@@ -27,7 +25,7 @@ class ComposedObject:
             x_int = int(x)
             y_int = int(y)
             self.canvas.after(delay_time + int(i * dt),
-                              move_objects,
+                              self.move_objects,
                               objects,
                               x_int - x_int_prev,
                               y_int - y_int_prev)
@@ -59,7 +57,7 @@ class Sun(ComposedObject):
                                                ystart - circle_radius,
                                                xstart + circle_radius,
                                                ystart + circle_radius,
-                                               fill='yellow'))
+                                               fill='yellow', activewidth=5))
 
         self.move_composed_object(objects, nmove, xstart, ystart, xend, yend, 0, move_time)
 
@@ -81,7 +79,7 @@ class Cloud(ComposedObject):
         )
         objects = [
             self.canvas.create_oval(xstart + xleft, ystart + ytop, xstart + xright, ystart + ybottom,
-                                    fill='white', width=0)
+                                    fill='white', activefill='grey', width=0)
             for xleft, ytop, xright, ybottom in rects
         ]
 
@@ -107,7 +105,8 @@ class Flowers(ComposedObject):
         delay_time = 200
         for i in range(len(xstarts)):
             objects = []
-            image = self.canvas.create_image(xstarts[i], ystart, image=rose)
+            image = self.canvas.create_image(xstarts[i], ystart,
+                                             image=small_rose, activeimage=big_rose)
             objects.append(image)
             self.move_composed_object(objects, nmove, xstarts[i], ystart, xstarts[i], yend, i * delay_time, move_time)
 
@@ -136,6 +135,7 @@ tk. \
     Button(buttons, text='Clear', command=lambda: canv.delete('all')). \
     pack(side=tk.LEFT)
 
-rose = tk.PhotoImage(file='../files/rose_2_40x53.png')
+small_rose = tk.PhotoImage(file='../files/rose_2_40x53.png')
+big_rose = tk.PhotoImage(file='../files/rose_2_100x133.png')
 
 top.mainloop()
