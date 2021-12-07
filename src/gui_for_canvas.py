@@ -1,5 +1,11 @@
 import math
 import tkinter as tk
+import random
+
+
+class Clouds:
+    def __init__(self, canvas, xstart, ystart, xend, yend, move_time):
+        Cloud(canvas, xstart, ystart, xend, yend, move_time, True)
 
 
 class ComposedObject:
@@ -11,7 +17,8 @@ class ComposedObject:
         for o in objects:
             canv.move(o, x, y)
 
-    def move_composed_object(self, objects, nmove, xstart, ystart, xend, yend, delay_time, move_time):
+    def move_composed_object(self, objects, nmove, xstart, ystart, xend, yend,
+                             delay_time, move_time, kill=False):
         dt = move_time / nmove
         dx = (xend - xstart) / nmove
         dy = (yend - ystart) / nmove
@@ -31,6 +38,13 @@ class ComposedObject:
                               y_int - y_int_prev)
             x_int_prev = x_int
             y_int_prev = y_int
+
+        if kill:
+            self.canvas.after(delay_time + move_time, self.kill, objects)
+
+    def kill(self, objects):
+        for o in objects:
+            self.canvas.delete(o)
 
 
 class Sun(ComposedObject):
@@ -63,27 +77,32 @@ class Sun(ComposedObject):
 
 
 class Cloud(ComposedObject):
-    def __init__(self, canvas):
+    def __init__(self, canvas, xstart, ystart, xend, yend, move_time, kill):
         super().__init__(canvas)
-        xstart = -80
-        ystart = 100
-        xend = 200
-        yend = 100
-        nmove = 100
-        move_time = 1000
-        rects = (
-            (-100, -30, 100, 30),
-            (-120, -60, 0, 0),
-            (-10, -70, 80, 0),
-            (-10, 0, 90, 40)
-        )
+        nmove = 500
+        #        rects = (
+        #            (-100, -30, 100, 30),
+        #            (-120, -60, 0, 0),
+        #            (-10, -70, 80, 0),
+        #            (-10, 0, 90, 40)
+        #        )
+        rects = []
+        for i in range(7):
+            cx = random.randint(-80, 80)
+            lx = random.randint(30, 70)
+            cy = random.randint(-25, 25)
+            ly = random.randint(20, 40)
+            rects.append((cx - lx, cy - ly, cx + lx, cy + ly))
+
         objects = [
             self.canvas.create_oval(xstart + xleft, ystart + ytop, xstart + xright, ystart + ybottom,
                                     fill='white', activefill='grey', width=0)
             for xleft, ytop, xright, ybottom in rects
         ]
 
-        self.move_composed_object(objects, nmove, xstart, ystart, xend, yend, 0, move_time)
+        self.move_composed_object(objects, nmove, xstart, ystart, xend, yend, 0, move_time, kill)
+        if kill:
+            self.canvas.after(int(move_time / 2), Cloud, self.canvas, xstart, ystart, xend, yend, move_time, kill)
 
 
 class Flowers(ComposedObject):
@@ -125,7 +144,11 @@ tk. \
     pack(side=tk.LEFT)
 
 tk. \
-    Button(buttons, text='Cloud', command=lambda: Cloud(canv)). \
+    Button(buttons, text='Cloud', command=lambda: Cloud(canv, -80, 100, 200, 100, 1000, False)). \
+    pack(side=tk.LEFT)
+
+tk. \
+    Button(buttons, text='Clouds', command=lambda: Clouds(canv, -120, 100, 700, 100, 8000)). \
     pack(side=tk.LEFT)
 
 tk.Button(buttons, text='Flowers', command=lambda: Flowers(canv)). \
