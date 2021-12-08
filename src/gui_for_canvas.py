@@ -94,8 +94,23 @@ class Flower(ComposedObject):
 
 class Clouds:
     def __init__(self, canvas, x_start, y_start, x_end, y_end, move_time, delay_time):
-        Cloud(canvas, x_start, y_start, x_end, y_end, move_time)
-        canvas.after(delay_time, Clouds, canvas, x_start, y_start, x_end, y_end, move_time, delay_time)
+        self.canvas, self.x_start, self.y_start, self.x_end, self.y_end, self.move_time, self.delay_time = \
+            canvas, x_start, y_start, x_end, y_end, move_time, delay_time
+        self.active = False
+
+    def start_stop(self):
+        self.active = not self.active
+        if self.active:
+            clouds_button.config(fg='green')
+            self.generate_clouds()
+        else:
+            clouds_button.config(fg='red')
+
+    def generate_clouds(self):
+        if self.active:
+            cloud = Cloud(self.canvas, self.x_start, self.y_start, self.x_end, self.y_end, self.move_time)
+            self.canvas.after(self.move_time, cloud.kill)
+            self.canvas.after(self.delay_time, self.generate_clouds)
 
 
 class Flowers:
@@ -133,11 +148,13 @@ tk. \
     Button(buttons, text='Cloud', command=lambda: Cloud(canv, -80, 100, 200, 100, 1000)). \
     pack(side=tk.LEFT)
 
-tk. \
-    Button(buttons, text='Clouds', command=lambda: Clouds(canv, -120, 100, 700, 100, 5000, 2000)). \
-    pack(side=tk.LEFT)
+clouds = Clouds(canv, -120, 100, 700, 100, 5000, 2000)
+clouds_button = tk. \
+    Button(buttons, text='Clouds', fg='red', command=clouds.start_stop)
+clouds_button.pack(side=tk.LEFT)
 
-tk.Button(buttons, text='Flowers', command=lambda: Flowers(canv)). \
+tk. \
+    Button(buttons, text='Flowers', command=lambda: Flowers(canv)). \
     pack(side=tk.LEFT)
 
 tk. \
@@ -148,3 +165,4 @@ small_rose = tk.PhotoImage(file='../files/rose_2_40x53.png')
 big_rose = tk.PhotoImage(file='../files/rose_2_100x133.png')
 
 top.mainloop()
+
