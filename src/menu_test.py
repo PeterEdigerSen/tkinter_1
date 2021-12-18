@@ -79,6 +79,6 @@ popup.add_command(label='Info', command=info)
 popup.add_separator()
 popup.add_command(label='Beenden', command=ende)
 
-frame1.bind('<Button-2>', popupMenu)
+frame1.bind('<Button-3>', popupMenu)
 
 root.mainloop()
