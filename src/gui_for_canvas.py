@@ -4,8 +4,11 @@ import tkinter as tk
 
 
 class ComposedObject:
-    def __init__(self, canvas):
+    def __init__(self, canvas, x_start, y_start, x_end, y_end, move_time, n_move):
         self.canvas = canvas
+        self.x_start, self.y_start, self.x_end, self.y_end, self.move_time, self.n_move = \
+            x_start, y_start, x_end, y_end, move_time, n_move
+        self.active = False
         self.objects = []
 
     def move_objects(self, x, y):
@@ -36,34 +39,45 @@ class ComposedObject:
         for o in self.objects:
             self.canvas.delete(o)
 
+    def start_stop(self, button=None, active=None):
+        if active is None:
+            self.active = not self.active
+        else:
+            self.active = active
+        if self.active:
+            if button:
+                button.config(fg='green')
+            self.move_composed_object(self.x_start, self.y_start, self.x_end, self.y_end, self.move_time, self.n_move)
+        else:
+            button.config(fg='red')
+            self.move_composed_object(self.x_end, self.y_end, self.x_start, self.y_start, self.move_time, self.n_move)
+
 
 class Sun(ComposedObject):
     def __init__(self, canvas, x_start, y_start, x_end, y_end, move_time):
-        super().__init__(canvas)
+        super().__init__(canvas, x_start, y_start, x_end, y_end, move_time, 100)
+
         nb = 10
         beam_length = 80
         circle_radius = 30
-        n_move = 100
         pi_n = math.pi / nb
         for i in range(nb):
-            self.objects.append(self.canvas.create_line(x_start - beam_length * math.cos(i * pi_n),
-                                                        y_start - beam_length * math.sin(i * pi_n),
-                                                        x_start + beam_length * math.cos(i * pi_n),
-                                                        y_start + beam_length * math.sin(i * pi_n),
+            self.objects.append(self.canvas.create_line(self.x_start - beam_length * math.cos(i * pi_n),
+                                                        self.y_start - beam_length * math.sin(i * pi_n),
+                                                        self.x_start + beam_length * math.cos(i * pi_n),
+                                                        self.y_start + beam_length * math.sin(i * pi_n),
                                                         fill='yellow', width='3'))
-        self.objects.append(self.canvas.create_oval(x_start - circle_radius,
-                                                    y_start - circle_radius,
-                                                    x_start + circle_radius,
-                                                    y_start + circle_radius,
+        self.objects.append(self.canvas.create_oval(self.x_start - circle_radius,
+                                                    self.y_start - circle_radius,
+                                                    self.x_start + circle_radius,
+                                                    self.y_start + circle_radius,
                                                     fill='yellow', activewidth=5))
-
-        self.move_composed_object(x_start, y_start, x_end, y_end, move_time, n_move)
 
 
 class Cloud(ComposedObject):
     def __init__(self, canvas, x_start, y_start, x_end, y_end, move_time):
-        super().__init__(canvas)
-        n_move = 500
+        super().__init__(canvas, x_start, y_start, x_end, y_end, move_time, 500)
+
         rects = []
         for i in range(7):
             cx = random.randint(-80, 80)
@@ -78,18 +92,15 @@ class Cloud(ComposedObject):
             for x_left, y_top, x_right, y_bottom in rects
         ]
 
-        self.move_composed_object(x_start, y_start, x_end, y_end, move_time, n_move)
-
 
 class Flower(ComposedObject):
     def __init__(self, canvas, x_start, y_start, x_end, y_end, move_time):
-        super().__init__(canvas)
+        super().__init__(canvas, x_start, y_start, x_end, y_end, move_time, 100)
 
-        n_move = 100
         image = self.canvas.create_image(x_start, y_start,
                                          image=small_rose, activeimage=big_rose)
         self.objects.append(image)
-        self.move_composed_object(x_start, y_start, x_end, y_end, move_time, n_move)
+        self.move_composed_object(x_start, y_start, x_end, y_end, move_time, 100)
 
 
 class Clouds:
@@ -108,8 +119,9 @@ class Clouds:
 
     def generate_clouds(self):
         if self.active:
-            cloud = Cloud(self.canvas, self.x_start, self.y_start, self.x_end, self.y_end, self.move_time)
-            self.canvas.after(self.move_time, cloud.kill)
+            one_cloud = Cloud(self.canvas, self.x_start, self.y_start, self.x_end, self.y_end, self.move_time)
+            one_cloud.start_stop()
+            self.canvas.after(self.move_time, one_cloud.kill)
             self.canvas.after(self.delay_time, self.generate_clouds)
 
 
@@ -140,17 +152,16 @@ canv.pack()
 buttons = tk.Frame(top)
 buttons.pack()
 
-tk. \
-    Button(buttons, text='Sun', command=lambda: Sun(canv, 580, 400, 450, 50, 1000)). \
-    pack(side=tk.LEFT)
+sun = Sun(canv, 580, 400, 450, 50, 1000)
+sun_button = tk.Button(buttons, text='Sun', fg='red', command=lambda: sun.start_stop(sun_button))
+sun_button.pack(side=tk.LEFT)
 
-tk. \
-    Button(buttons, text='Cloud', command=lambda: Cloud(canv, -80, 100, 200, 100, 1000)). \
-    pack(side=tk.LEFT)
+cloud = Cloud(canv, -100, 100, 200, 100, 1000)
+cloud_button = tk.Button(buttons, fg='red', text='Cloud', command=lambda: cloud.start_stop(cloud_button))
+cloud_button.pack(side=tk.LEFT)
 
 clouds = Clouds(canv, -120, 100, 700, 100, 5000, 2000)
-clouds_button = tk. \
-    Button(buttons, text='Clouds', fg='red', command=clouds.start_stop)
+clouds_button = tk.Button(buttons, text='Clouds', fg='red', command=clouds.start_stop)
 clouds_button.pack(side=tk.LEFT)
 
 tk. \
@@ -165,4 +176,3 @@ small_rose = tk.PhotoImage(file='../files/rose_2_40x53.png')
 big_rose = tk.PhotoImage(file='../files/rose_2_100x133.png')
 
 top.mainloop()
-
