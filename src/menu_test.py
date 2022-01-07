@@ -1,7 +1,5 @@
-import _curses
 from tkinter import *
 
-import click
 
 
 def donothing(nothing_button="Do nothing button"):
